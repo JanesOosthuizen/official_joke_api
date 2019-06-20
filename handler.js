@@ -1,26 +1,32 @@
-'use strict';
+const jokes = require('./jokes/index.json');
 
-var jokes = require('./jokes/index.json');
-
-const random_ten = () => {
-  const r_indices = [];
-  while (r_indices.length < 10) {
-    const random_index = Math.floor(Math.random() * jokes.length);
-    if (!r_indices.indexOf(random_index) > -1) {
-      r_indices.push(random_index);
-    }
-  }
-  const r_jokes = [];
-  for (let i=0; i<r_indices.length; i++) {
-    const r_index = r_indices[i];
-    r_jokes.push(jokes[r_index]);
-  }
-
-  return r_jokes;
-};
-
-const random_joke = () => {
+const randomJoke = () => {
   return jokes[Math.floor(Math.random() * jokes.length)];
 }
 
-module.exports = { random_ten, random_joke };
+/**
+ * Get N random jokes from a jokeArray
+ */
+const randomN = (jokeArray, n) => {
+  const limit = jokeArray.length < n ? jokeArray.length : n;
+  const randomIndicesSet = new Set();
+
+  while (randomIndicesSet.size < limit) {
+    const randomIndex = Math.floor(Math.random() * jokeArray.length);
+    if (!randomIndicesSet.has(randomIndex)) {
+      randomIndicesSet.add(randomIndex);
+    }
+  }
+
+  return Array.from(randomIndicesSet).map(randomIndex => {
+    return jokeArray[randomIndex];
+  });
+};
+
+const randomTen = () => randomN(jokes, 10);
+
+const jokeByType = (type, n) => {
+  return randomN(jokes.filter(joke => joke.type === type), n);
+};
+
+module.exports = { randomJoke, randomTen, jokeByType };
